@@ -120,6 +120,7 @@ import { default as init } from './init.js';
 import { default as stackPrefetch } from './stackTools/stackPrefetch.js';
 import { default as stackRenderers } from './stackTools/stackRenderers.js';
 import { playClip, stopClip } from './stackTools/playClip.js';
+import scrollToIndex from './util/scrollToIndex.js';
 
 // ~~~~~~ STATE MANAGEMENT ~~~~~ //
 import { default as store } from './store/index.js';
@@ -237,6 +238,7 @@ const cornerstoneTools = {
   stackRenderers,
   playClip,
   stopClip,
+  scrollToIndex,
   store,
   getToolForElement,
   addTool,
@@ -334,6 +336,7 @@ export {
   stackRenderers,
   playClip,
   stopClip,
+  scrollToIndex,
   store,
   getToolForElement,
   addTool,
