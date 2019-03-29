@@ -192,6 +192,9 @@ export function planePlaneIntersection(targetImagePlane, referenceImagePlane) {
 
   line.start = origin;
   line.end = origin.clone().add(direction.multiplyScalar(distance));
+  //https://github.com/cornerstonejs/cornerstoneTools/issues/379
+  //extend line
+  line.end.add(direction.multiplyScalar(0.5));
 
   // Find the intersections between this line and the reference image plane's four sides
   const rect = getRectangleFromImagePlane(referenceImagePlane);
