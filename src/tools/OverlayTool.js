@@ -2,6 +2,12 @@ import external from '../externalModules.js';
 import BaseTool from './base/BaseTool.js';
 // Drawing
 import { getNewContext } from '../drawing/index.js';
+// State
+import {
+  addToolState,
+  getToolState,
+  clearToolState,
+} from './../stateManagement/toolState.js';
 
 /**
  *
@@ -34,6 +40,7 @@ export default class OverlayTool extends BaseTool {
 
   disabledCallback(element) {
     this.forceImageUpdate(element);
+    clearToolState(element, this.name);
   }
 
   forceImageUpdate(element) {
@@ -52,12 +59,23 @@ export default class OverlayTool extends BaseTool {
       return;
     }
 
+    const toolData = getToolState(evt.currentTarget, this.name);
     const context = getNewContext(eventData.canvasContext.canvas);
-    const overlaysMeta = external.cornerstone.metaData.get(
-      'overlayPlaneModule',
-      eventData.image.imageId
-    ) || { overlays: [] };
-    const overlays = overlaysMeta.overlays;
+    let overlays;
+
+    if (toolData === undefined) {
+      const overlaysMeta = external.cornerstone.metaData.get(
+        'overlayPlaneModule',
+        image.imageId
+      ) || { overlays: [] };
+
+      overlays = overlaysMeta.overlays;
+      overlays.forEach(overlay =>
+        addToolState(evt.currentTarget, this.name, overlay)
+      );
+    } else {
+      overlays = toolData.data;
+    }
 
     const viewportPixelSpacing = {
       column: viewport.displayedArea.columnPixelSpacing || 1,
@@ -81,8 +99,8 @@ export default class OverlayTool extends BaseTool {
       }
       const layerCanvas = document.createElement('canvas');
 
-      layerCanvas.width = imageWidth;
-      layerCanvas.height = imageHeight;
+      layerCanvas.width = overlay.columns;
+      layerCanvas.height = overlay.rows;
       const layerContext = layerCanvas.getContext('2d');
       const transform = external.cornerstone.internal.getTransform(
         enabledElement
@@ -115,6 +133,15 @@ export default class OverlayTool extends BaseTool {
         }
       }
       layerContext.restore();
+
+      context.setTransform(
+        transform.m[0],
+        transform.m[1],
+        transform.m[2],
+        transform.m[3],
+        transform.m[4],
+        transform.m[5]
+      );
       context.drawImage(layerCanvas, 0, 0);
     });
 
